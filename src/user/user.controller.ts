@@ -8,8 +8,8 @@ import { UserEntity } from './entities/user.entity';
 export class UserController {
   constructor(private readonly UserService: UserService) {}
 
-  @Post('createuser')
-  async createUser(@Body() dto:CreateUserDto): Promise<UserEntity> {
+  @Post('signup')
+  async createUser(@Body() dto:CreateUserDto) {
     return  await this. UserService.createUser(dto)
   }
 
@@ -19,7 +19,7 @@ export class UserController {
   // }
 
   @Get(':id')
-  async getById(@Param('id') id: number): Promise<UserEntity> {
+  async getById(@Param('id') id: string): Promise<UserEntity> {
     return this.UserService.findOneById(id);
   }
 
@@ -29,7 +29,7 @@ export class UserController {
   }
 
   @Delete(':id')
-  async delete(@Param('id') id: number) {
+  async delete(@Param('id') id:number) {
     return this.UserService.remove(id);
   }
 }

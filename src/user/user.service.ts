@@ -1,9 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserEntity } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UserService {
@@ -11,18 +13,32 @@ export class UserService {
   constructor(
     @InjectRepository(UserEntity )
     private userRepository:Repository<UserEntity >,
+    private jwtService:JwtService
   ){}
 
-  async createUser(dto:CreateUserDto): Promise<UserEntity>{
+  async createUser(dto:CreateUserDto){
+    const user = this.findByEmail(dto.email)
+    if(await user){
+      throw new BadRequestException('email already exists')
+    }
+
+
+    const salt = await bcrypt.genSalt(10);
+    dto.password = await bcrypt.hash(dto.password, salt);
+
+const payload = { sub: 'user.id', email: 'user.email' };
     const newCar = await this.userRepository.create(dto);
-    return this.userRepository.save(newCar)
+    return{
+     userDetails : await this.userRepository.save(newCar),
+     access_token: await this.jwtService.signAsync(payload),
+    }
   }
   // async getAllData(): Promise<UserEntity[]>{
   //   return this.userRepository.find()
   // }
 
 
-  async findOneById(id: number, ): Promise<UserEntity> {
+  async findOneById(id: string, ): Promise<UserEntity> {
     const user = await this.userRepository.findOne({ where: { id } });
 
 
@@ -38,15 +54,33 @@ export class UserService {
 
     
       }
-
-
-      async findByUsername(username: string): Promise<UserEntity | null> {
-        return await this.userRepository.findOne({ where: { username } });
-    }
+    
     
     async findByPassword(password: string): Promise<UserEntity | null> {
       return await this.userRepository.findOne({ where: { password } });
   }
+
+  async findByEmail(email: string){
+    const emailexist= await this.userRepository.findOne({ where: { email} });
+    // if(!emailexist){
+    //   throw new BadRequestException(' no email exist');
+      
+    
+    // }
+    return emailexist
+}
+
+
+
+
+
+
+
+
+
+
+
+
   
   
     

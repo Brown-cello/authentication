@@ -3,8 +3,9 @@ import { base } from "./base.entity";
 
 @Entity()
 export class UserEntity extends base { 
-    @Column()
-    username:string
+
+@Column({nullable:true ,unique:true})
+email:string
 
     @Column()
     password:string
