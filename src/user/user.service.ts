@@ -21,9 +21,7 @@ export class UserService {
     if(await user){
       throw new BadRequestException('email already exists')
     }
-
-
-    const salt = await bcrypt.genSalt(10);
+     const salt = await bcrypt.genSalt(10);
     dto.password = await bcrypt.hash(dto.password, salt);
 
 const payload = { sub: 'user.id', email: 'user.email' };
