@@ -9,5 +9,8 @@ email:string
 
     @Column()
     password:string
+
+    @Column({ default: false }) 
+    isBlocked: boolean;
 }
 

@@ -69,6 +69,16 @@ const payload = { sub: 'user.id', email: 'user.email' };
 }
 
 
+async blockUser(userId: string, block: boolean){
+  const user = await this.userRepository.findOne({ where: { id: userId } });
+  if (!user) {
+    throw new NotFoundException('User not found');
+  }
+  user.isBlocked = block;
+  return this.userRepository.save(user);
+}
+
+
 
 
 

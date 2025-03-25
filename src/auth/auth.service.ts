@@ -21,6 +21,11 @@ export class AuthService {
       throw new UnauthorizedException('invalid credentials');
     }
 
+    if (user.isBlocked) { 
+      throw new UnauthorizedException('User is blocked');
+    }
+
+
     const payload = { sub: user.id, email: user.email };
     return {
       userId:user.id,
